@@ -1,14 +1,541 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinalGrade.io</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='90'>🔥</text></svg>" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 1;
+            transition: opacity 0.6s ease-out;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-fire {
+            font-size: 80px;
+            animation: fireFlicker 1.5s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fireFlicker {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            25% { transform: scale(1.05) rotate(-2deg); opacity: 0.95; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 0.9; }
+            75% { transform: scale(1.05) rotate(-2deg); opacity: 0.95; }
+        }
+
+        .loading-text {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF5722, #FFB74D, #FF5722);
+            width: 0%;
+            animation: loading 2s ease-in-out forwards;
+            border-radius: 2px;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .loading-subtext {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        body.loading {
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <div id="loadingScreen" class="loading">
+        <div class="loading-content">
+            <div class="loading-fire">🔥</div>
+            <div class="loading-text">FinalGrade.io</div>
+            <div class="loading-bar">
+                <div class="loading-bar-fill"></div>
+            </div>
+            <div class="loading-subtext">Loading your grade calculator...</div>
+        </div>
+    </div>
+    <div id="headerContainer">
+        <div id="taskbar">
+            <div id="taskbarTitle">
+                <span style="font-size: 32px; margin-right: 8px;">🔥</span>
+                FinalGrade.io
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <div class="tabs">
+            <button class="tab-link active" data-view="teacher">Teacher View</button>
+            <button class="tab-link" data-view="student">Student View</button>
+        </div>
+    </div>
+
+    <div id="teacherView" class="view-content active">
+        <div class="container">
+            <h1>Teacher View - Grade Calculator</h1>
+            
+            <div style="margin-bottom: 20px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
+                <label for="classNameInput" style="display: block; margin-bottom: 6px; font-weight: 600; color: #333;">Class Name:</label>
+                <input type="text" id="classNameInput" placeholder="e.g., Algebra, Biology, History..." style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: 'Inter', sans-serif;" />
+            </div>
+
+            <div id="categoriesContainer"></div>
+
+            <button id="calculateBtn">Calculate Overall Grade</button>
+
+            <button id="addCategoryBtn">
+                <span class="material-icons">add</span> Add Category
+            </button>
+
+            <button id="resetEverythingBtn" class="reset-btn">
+                <span class="material-icons">refresh</span> Reset Everything
+            </button>
+
+            <div class="bulk-action-buttons">
+                <button id="removeSelectedAssignmentsBtn" class="bulk-action-btn">
+                    <span class="material-icons">delete</span> Remove Selected Assignments
+                </button>
+                <button id="removeSelectedCategoriesBtn" class="bulk-action-btn">
+                    <span class="material-icons">delete</span> Remove Selected Categories
+                </button>
+            </div>
+
+            <div id="overallGradeSection">
+                <div id="decimalSelector" style="text-align: center; margin: 10px 0;">
+                    <button class="decimal-btn" data-decimals="0">0</button>
+                    <button class="decimal-btn" data-decimals="1">1</button>
+                    <button class="decimal-btn active" data-decimals="2">2</button>
+                </div>
+                <div id="overallResult">Overall Grade: </div>
+
+                <div id="overallGradeSettings">
+                    <h3>Overall Grade Settings</h3>
+                    <label for="maxGradeCapacity">Maximum Grade Capacity:</label>
+                    <input type="number" id="maxGradeCapacity" value="100" step="0.1" min="0">
+                    <div id="uncappedOverallGrade">Uncapped Overall Grade: </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="weightedCalculation">
+            <h3>Weighted Grade Calculation Explanation</h3>
+            <p style="font-style: italic; margin-bottom: 12px;">Example (Weights in Percent):</p>
+            <p style="margin: 4px 0; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-radius: 6px;">
+                Math: 80, Weight: 30%<br>
+                Biology: 90, Weight: 50%<br>
+                History: 72, Weight: 20%<br><br>
+                <strong>Weighted Grade</strong> = (0.30 × 80) + (0.50 × 90) + (0.20 × 72) = 24 + 45 + 14.4 = 83.4
+            </p>
+            <p style="font-style: italic; margin-top: 16px; margin-bottom: 12px;">Example (Weights in Points/Hours):</p>
+            <p style="margin: 4px 0; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-radius: 6px;">
+                Math: 80, Weight: 3 points<br>
+                Biology: 90, Weight: 5 points<br>
+                History: 72, Weight: 2 points<br><br>
+                <strong>Weighted Grade</strong> = (3×80 + 5×90 + 2×72) / (3+5+2) = (240 + 450 + 144) / 10 = 834 / 10 = 83.4
+            </p>
+        </div>
+    </div>
+
+    <div id="studentView" class="view-content">
+        <div class="container">
+            <h1>Student View - Grade Summary</h1>
+            <div id="studentClassName" style="text-align: center; font-size: 13px; color: #999; margin-bottom: 20px; min-height: 20px; font-weight: 500;"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button id="refreshStudentGradeBtn" class="refresh-btn" style="margin: 0; flex-shrink: 0;">
+                    <span class="material-icons">refresh</span> Refresh Current Grade
+                </button>
+                <div id="studentOverallGrade" style="font-size: 18px; font-weight: bold; color: #1976d2; white-space: nowrap; flex-grow: 1; text-align: right;">Overall Grade: </div>
+            </div>
+            
+            <div id="studentCategoriesSummary"></div>
+        </div>
+
+        <div id="studentWeightedCalculationExplanation" class="weighted-calculation">
+            <h3>Weighted Grade Calculation Explanation</h3>
+            <p style="font-style: italic; margin-bottom: 12px;">Example (Weights in Percent):</p>
+            <p style="margin: 4px 0; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-radius: 6px;">
+                Math: 80, Weight: 30%<br>
+                Biology: 90, Weight: 50%<br>
+                History: 72, Weight: 20%<br><br>
+                <strong>Weighted Grade</strong> = (0.30 × 80) + (0.50 × 90) + (0.20 × 72) = 24 + 45 + 14.4 = 83.4
+            </p>
+            <p style="font-style: italic; margin-top: 16px; margin-bottom: 12px;">Example (Weights in Points/Hours):</p>
+            <p style="margin: 4px 0; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-radius: 6px;">
+                Math: 80, Weight: 3 points<br>
+                Biology: 90, Weight: 5 points<br>
+                History: 72, Weight: 2 points<br><br>
+                <strong>Weighted Grade</strong> = (3×80 + 5×90 + 2×72) / (3+5+2) = (240 + 450 + 144) / 10 = 834 / 10 = 83.4
+            </p>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2 id="modalTitle">Create Category</h2>
+            <label for="categoryNameInput">Name:</label>
+            <input type="text" id="categoryNameInput" placeholder="e.g., Final, Formative..." />
+            <label for="categoryWeightInput">Weight (%)</label>
+            <input type="number" id="categoryWeightInput" placeholder="e.g., 10" step="0.1" min="0" max="100" />
+            <div class="modal-buttons">
+                <button id="modalCreateBtn">Create</button>
+                <button id="modalCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="removeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2>Remove Category</h2>
+            <p id="removeModalText">For category "", choose an option:</p>
+            <div class="modal-buttons" style="display: flex; flex-direction: column; gap: 10px;">
+                <button id="removeAllBtn">Remove All</button>
+                <button id="removeAssignmentsOnlyBtn">Remove Assignments Only</button>
+                <button id="removeGradeInAssignmentsBtn">Remove Grade in Assignments</button>
+                <button id="removeCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="commentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2 id="commentModalTitle">Add Comment</h2>
+            <p id="commentAssignmentName"></p>
+            <textarea id="commentText" maxlength="1000" placeholder="Enter your comment here..."></textarea>
+            <div id="commentCharCount">0/1000</div>
+            <div class="modal-buttons">
+                <button id="saveCommentBtn">Save Comment</button>
+                <button id="cancelCommentBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="assignmentDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2 id="detailsAssignmentName" style="margin-top: 0; margin-bottom: 24px; border-bottom: 2px solid #1976d2; padding-bottom: 12px;">Assignment Details</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                <div>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Category</p>
+                    <p style="margin: 0; font-size: 16px; color: #333; font-weight: 600;"><span id="detailsCategoryName"></span></p>
+                </div>
+                <div>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Grade</p>
+                    <p style="margin: 0; font-size: 16px; color: #1976d2; font-weight: 600;"><span id="detailsAssignmentGrade"></span></p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                <div>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Points</p>
+                    <p style="margin: 0; font-size: 16px; color: #333; font-weight: 600;"><span id="detailsAssignmentPoints"></span></p>
+                </div>
+                <div id="multiplierSection">
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Multiplier</p>
+                    <p style="margin: 0; font-size: 16px; color: #333; font-weight: 600;"><span id="detailsAssignmentMultiplier"></span></p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Status</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span id="detailsAssignmentStatus" style="font-size: 14px; color: #333; font-weight: 600;"></span>
+                </div>
+            </div>
+
+            <div class="assignment-details-comment" style="padding: 12px; background: #f9f9f9; border-left: 4px solid #1976d2; border-radius: 4px;">
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #999; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Comment</p>
+                <p id="detailsAssignmentComment" style="margin: 0; font-size: 14px; color: #555; line-height: 1.5;"></p>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 24px;">
+                <button id="detailsCloseBtn" style="width: 100%;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="appFooter">
+        <span style="font-size: 18px;">🔥</span>
+        <span>2026 FinalGrade.io. All Rights Reserved. | Version 26.0.0-beta</span>
+        <div style="margin-left: auto; display: flex; gap: 16px; font-size: 12px;">
+            <a href="#" id="whatsNewLink" style="color: #1976d2; text-decoration: none; cursor: pointer;">What's New?</a>
+            <a href="#" id="privacyLink" style="color: #1976d2; text-decoration: none; cursor: pointer;">Privacy Policy</a>
+            <a href="#" id="termsLink" style="color: #1976d2; text-decoration: none; cursor: pointer;">Terms of Service</a>
+        </div>
+    </div>
+
+    <!-- Info Modals -->
+    <div id="whatsNewModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2 style="margin-top: 0; border-bottom: 2px solid #1976d2; padding-bottom: 12px;">What's New?</h2>
+            <div style="max-height: 450px; overflow-y: auto; padding-right: 12px;">
+                <h3 style="margin-top: 0; color: #1976d2; font-size: 16px;">🆕 Version 26.0.0-beta (December 2025)</h3>
+                <p><strong>Latest Release - Current Version</strong></p>
+                <ul style="margin: 8px 0; padding-left: 20px; font-size: 14px;">
+                    <li>Complete redesign of UI with modern animations</li>
+                    <li>Improved loading screen with visual feedback</li>
+                    <li>Enhanced modal dialogs with smooth transitions</li>
+                    <li>Custom scrollbars throughout the application</li>
+                    <li>Better responsive design for mobile devices</li>
+                </ul>
+
+                <h3 style="color: #1976d2; font-size: 16px;">Version 25.4.0 (November 2025)</h3>
+                <ul style="margin: 8px 0; padding-left: 20px; font-size: 14px;">
+                    <li>Fixed assignment status tracking</li>
+                    <li>Improved calculation accuracy</li>
+                    <li>Student view enhancements</li>
+                </ul>
+
+                <h3 style="color: #1976d2; font-size: 16px;">Version 25.3.0 (October 2025)</h3>
+                <ul style="margin: 8px 0; padding-left: 20px; font-size: 14px;">
+                    <li>Added comment system for assignments</li>
+                    <li>Improved category management</li>
+                    <li>Bug fixes and performance improvements</li>
+                </ul>
+
+                <h3 style="color: #1976d2; font-size: 16px;">Version 25.2.0 (August 2025)</h3>
+                <ul style="margin: 8px 0; padding-left: 20px; font-size: 14px;">
+                    <li>Student view implementation</li>
+                    <li>Assignment multiplier feature</li>
+                    <li>Enhanced grade capping system</li>
+                </ul>
+
+                <h3 style="color: #1976d2; font-size: 16px;">Version 25.1.0 (May 2025)</h3>
+                <ul style="margin: 8px 0; padding-left: 20px; font-size: 14px;">
+                    <li>Initial release of FinalGrade.io</li>
+                    <li>Basic grade calculation</li>
+                    <li>Category and assignment management</li>
+                </ul>
+            </div>
+            <div class="modal-buttons" style="margin-top: 16px;">
+                <button style="background: #1976d2 !important; color: #fff !important; padding: 8px 16px; border-radius: 999px; border: none; cursor: pointer;" onclick="document.getElementById('whatsNewModal').style.display='none'">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2 style="margin-top: 0; border-bottom: 2px solid #1976d2; padding-bottom: 12px;">Privacy Policy</h2>
+            <div style="max-height: 450px; overflow-y: auto; padding-right: 12px; font-size: 14px; line-height: 1.6;">
+                <p><strong>Last Updated: December 2025</strong></p>
+                
+                <h3 style="color: #1976d2;">1. Information We Collect</h3>
+                <p>FinalGrade.io stores all your grade data locally in your browser. We do not collect or transmit any personal information to external servers.</p>
+
+                <h3 style="color: #1976d2;">2. Data Storage</h3>
+                <p>All data is stored using browser localStorage. This data remains on your device and is not sent to our servers or shared with third parties.</p>
+
+                <h3 style="color: #1976d2;">3. Cookies</h3>
+                <p>We do not use cookies or tracking technologies to identify you personally.</p>
+
+                <h3 style="color: #1976d2;">4. Data Security</h3>
+                <p>Since data is stored locally on your device, you are responsible for maintaining the security of your device and browser.</p>
+
+                <h3 style="color: #1976d2;">5. Third-Party Services</h3>
+                <p>FinalGrade.io uses Google Fonts and Material Icons. Please refer to Google's privacy policy for information about their data practices.</p>
+
+                <h3 style="color: #1976d2;">6. Changes to This Policy</h3>
+                <p>We may update this privacy policy periodically. Changes will be reflected in the "Last Updated" date.</p>
+            </div>
+            <div class="modal-buttons" style="margin-top: 16px;">
+                <button style="background: #1976d2 !important; color: #fff !important; padding: 8px 16px; border-radius: 999px; border: none; cursor: pointer;" onclick="document.getElementById('privacyModal').style.display='none'">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2 style="margin-top: 0; border-bottom: 2px solid #1976d2; padding-bottom: 12px;">Terms of Service</h2>
+            <div style="max-height: 450px; overflow-y: auto; padding-right: 12px; font-size: 14px; line-height: 1.6;">
+                <p><strong>Last Updated: December 2025</strong></p>
+
+                <h3 style="color: #1976d2;">1. Acceptance of Terms</h3>
+                <p>By using FinalGrade.io, you agree to these Terms of Service. If you do not agree, please do not use this service.</p>
+
+                <h3 style="color: #1976d2;">2. Use License</h3>
+                <p>We grant you a limited, non-exclusive license to use FinalGrade.io for personal or educational purposes only.</p>
+
+                <h3 style="color: #1976d2;">3. Disclaimer</h3>
+                <p>FinalGrade.io is provided "as is" without warranties. We are not liable for any errors in calculations or data loss.</p>
+
+                <h3 style="color: #1976d2;">4. Data Backup</h3>
+                <p>Users are responsible for backing up their grade data. We recommend regularly exporting your data.</p>
+
+                <h3 style="color: #1976d2;">5. Prohibited Use</h3>
+                <p>You agree not to use FinalGrade.io for any unlawful purposes or to harass, threaten, or abuse others.</p>
+
+                <h3 style="color: #1976d2;">6. Limitation of Liability</h3>
+                <p>FinalGrade.io and its creators shall not be liable for any indirect, incidental, special, or consequential damages.</p>
+
+                <h3 style="color: #1976d2;">7. Changes to Terms</h3>
+                <p>We reserve the right to modify these terms at any time. Continued use constitutes acceptance of changes.</p>
+            </div>
+            <div class="modal-buttons" style="margin-top: 16px;">
+                <button style="background: #1976d2 !important; color: #fff !important; padding: 8px 16px; border-radius: 999px; border: none; cursor: pointer;" onclick="document.getElementById('termsModal').style.display='none'">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-select Modals -->
+    <div id="removeAssignmentsModal" class="multiselect-modal">
+        <div class="multiselect-modal-content">
+            <span class="close-modal-btn material-icons" onclick="document.getElementById('removeAssignmentsModal').style.display='none'">close</span>
+            <h2 style="margin-top: 0; border-bottom: 2px solid #1976d2; padding-bottom: 12px;">Select Assignments to Remove</h2>
+            <div style="padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 5px;">
+                <label style="cursor: pointer; padding: 0 15px; display: flex; align-items: center;"><input type="checkbox" id="selectAllAssignmentsCheckbox" style="margin-right: 12px; width: 18px; height: 18px; cursor: pointer;"> <strong>Select All</strong></label>
+            </div>
+            <div id="assignmentsMultiselectContainer" class="multiselect-items-container"></div>
+            <div class="multiselect-modal-buttons">
+                <button class="multiselect-delete-btn" id="confirmDeleteAssignmentsBtn">Delete Selected</button>
+                <button class="multiselect-cancel-btn" onclick="document.getElementById('removeAssignmentsModal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="removeCategoriesModal" class="multiselect-modal">
+        <div class="multiselect-modal-content">
+            <span class="close-modal-btn material-icons" onclick="document.getElementById('removeCategoriesModal').style.display='none'">close</span>
+            <h2 style="margin-top: 0; border-bottom: 2px solid #1976d2; padding-bottom: 12px;">Select Categories to Remove</h2>
+            <div style="padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 5px;">
+                <label style="cursor: pointer; padding: 0 15px; display: flex; align-items: center;"><input type="checkbox" id="selectAllCategoriesCheckbox" style="margin-right: 12px; width: 18px; height: 18px; cursor: pointer;"> <strong>Select All</strong></label>
+            </div>
+            <div id="categoriesMultiselectContainer" class="multiselect-items-container"></div>
+            <div class="multiselect-modal-buttons">
+                <button class="multiselect-delete-btn" id="confirmDeleteCategoriesBtn">Delete Selected</button>
+                <button class="multiselect-cancel-btn" onclick="document.getElementById('removeCategoriesModal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="resetConfirmModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-modal-btn material-icons">close</span>
+            <h2 style="margin-top: 0; border-bottom: 2px solid #f44336; padding-bottom: 12px; color: #f44336;">⚠️ Reset Everything</h2>
+            <p style="font-size: 16px; color: #333; margin: 20px 0;">Are you sure you want to reset EVERYTHING?</p>
+            <p style="font-size: 14px; color: #666; margin: 15px 0; line-height: 1.6;">This will delete all your data and reload the website with default categories:</p>
+            <ul style="font-size: 13px; color: #666; margin: 10px 0 20px 20px; line-height: 1.8;">
+                <li>4.5 Week Progress (blank weight)</li>
+                <li>9 Week Progress (blank weight)</li>
+                <li>13.5 Week Progress (blank weight)</li>
+                <li>18 Week Progress (blank weight)</li>
+                <li>Final Avg. (blank weight)</li>
+                <li>Final (10%)</li>
+                <li>Formative (40%)</li>
+                <li>Summative (50%)</li>
+                <li>Uncategorized Assignment (0%)</li>
+            </ul>
+            <p style="font-size: 12px; color: #f44336; font-weight: 600; margin: 15px 0;">This action cannot be undone.</p>
+            <div class="modal-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                <button id="confirmResetBtn" style="background: #f44336 !important; color: #fff !important; padding: 10px 16px; border-radius: 999px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Reset Everything</button>
+                <button id="cancelResetBtn" style="background: transparent !important; color: #000 !important; padding: 10px 16px; border-radius: 999px; border: 2px solid #000 !important; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hide loading screen when DOM is ready and fonts are loaded
+        window.addEventListener('load', function() {
+            document.fonts.ready.then(() => {
+                setTimeout(() => {
+                    const loadingScreen = document.getElementById('loadingScreen');
+                    if (loadingScreen) {
+                        loadingScreen.classList.add('hidden');
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 600);
+                    }
+                    document.body.classList.remove('loading');
+                }, 500);
+            });
+        });
+
+        // Info Modal Links
+        document.getElementById('whatsNewLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('whatsNewModal').style.display = 'block';
+        });
+
+        document.getElementById('privacyLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('privacyModal').style.display = 'block';
+        });
+
+        document.getElementById('termsLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('termsModal').style.display = 'block';
+        });
+
+        // Close modals when clicking close button
+        document.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modal = btn.closest('.modal');
+                if (modal) modal.style.display = 'none';
+            });
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+    <script src="main.js"></script>
 </body>
 </html>
