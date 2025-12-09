@@ -207,12 +207,15 @@ No known issues at this time. If you encounter any problems, please report them.
 | General Support | 48 hours |
 | Security Issues | Immediate |
 
-### Support Channels
+### Support Channel
 
-- **GitHub Issues**: ✅ Active
-- **Email**: ✅ Monitored
-- **Discussions**: ✅ Active
-- **Documentation**: ✅ Complete
+**Email**: toxicbusinessstudios@gmail.com
+
+Please include the following in your email:
+- Your issue description
+- Browser and version information
+- Steps to reproduce (if applicable)
+- Screenshots (if helpful)
 
 ---
 
@@ -355,9 +358,13 @@ Q2 2026 ────── v27.0.0 (Planned)
 
 ## 📋 Incident Report Form
 
-**Found a bug?** Report it here:
+**Found a bug?** Report it via email:
 
-1. **Describe the Issue**
+Send to: **toxicbusinessstudios@gmail.com**
+
+**Please include:**
+
+1. **Issue Description**
    - What happened?
    - What should happen?
    - Steps to reproduce
@@ -367,10 +374,12 @@ Q2 2026 ────── v27.0.0 (Planned)
    - Device type
    - Operating system
 
-3. **Submit**
-   - Create GitHub issue
-   - Email: bugs@finalgrades.io
-   - Include screenshots if possible
+3. **Additional Details**
+   - Screenshots (if applicable)
+   - Error messages (if any)
+   - When did it occur?
+
+We will respond within 24-48 hours with next steps.
 
 ---
 
@@ -384,11 +393,9 @@ Q2 2026 ────── v27.0.0 (Planned)
 
 ## 📞 Contact Information
 
-### Support Channels
+### Support Channel
 
-- **GitHub Issues**: https://github.com/yourusername/finalgrades/issues
-- **Email**: support@finalgrades.io
-- **Discussion**: https://github.com/yourusername/finalgrades/discussions
+**Email**: toxicbusinessstudios@gmail.com
 
 ### Response Times
 
@@ -396,6 +403,14 @@ Q2 2026 ────── v27.0.0 (Planned)
 - **Bug Reports**: 24-48 hours
 - **Feature Requests**: 48-72 hours
 - **General Inquiries**: 48 hours
+
+### How to Contact
+
+Send an email to **toxicbusinessstudios@gmail.com** with:
+1. Subject: Brief description of your issue
+2. Body: Detailed explanation with steps to reproduce
+3. System info: Browser, device, OS
+4. Attachments: Screenshots if applicable
 
 ---
 
