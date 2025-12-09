@@ -2,9 +2,9 @@
 
 > **A powerful, modern grade calculation tool for teachers and students**
 
-[![Version](https://img.shields.io/badge/Version-26.0.0--beta-blue.svg)](https://github.com/yourusername/finalgrades)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Active-success.svg)](https://github.com/yourusername/finalgrades)
+[![Version](https://img.shields.io/badge/Version-26.0.0--beta-blue.svg)](UPDATES.md)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+[![Status](https://img.shields.io/badge/Status-Active-success.svg)](STATUS.md)
 
 ## 📋 Table of Contents
 
