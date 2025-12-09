@@ -21,6 +21,7 @@
 - [Browser Support](#browser-support)
 - [Contributing](#contributing)
 - [License](#license)
+- [Additional Resources](#additional-resources)
 
 ## 🎯 Overview
 
@@ -536,6 +537,35 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Open source community inspiration
 
 ## 📚 Additional Resources
+
+### Important Documents
+
+- **[📋 UPDATES.md](UPDATES.md)** - Complete version history, release notes, and what's new
+  - v26.0.0-beta (December 2025) - Latest release
+  - v25.4.0 (November 2025) - Previous release
+  - v25.3.0 (October 2025)
+  - v25.2.0 (August 2025)
+  - v25.1.0 (May 2025)
+  - Roadmap and future plans
+  - FAQ and upgrade guide
+
+- **[📜 LICENSE.md](LICENSE.md)** - MIT License and terms
+  - Full license text and explanation
+  - Usage rights and restrictions
+  - Copyright notice
+  - Warranty disclaimer
+  - Commercial use guidelines
+  - Third-party components
+
+- **[📊 STATUS.md](STATUS.md)** - Current system status and metrics
+  - System operational status
+  - Performance metrics
+  - Known issues (if any)
+  - Incident history
+  - Maintenance schedule
+  - Support information
+
+### External Links
 
 - [MDN Web Docs](https://developer.mozilla.org/)
 - [CSS-Tricks](https://css-tricks.com/)
