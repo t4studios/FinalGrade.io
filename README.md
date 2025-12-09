@@ -596,4 +596,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 *Last Updated: December 2025*  
 *Maintained by: FinalGrade.io Team*  
-*Repository: github.com/yourusername/finalgrades*
+*Repository: https://github.com/t4studios/FinalGrade.io/tree/main*
